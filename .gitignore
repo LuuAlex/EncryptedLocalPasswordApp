@@ -1,18 +1,17 @@
-client/node_modules/
-client/.expo/
-client/client/dist/
-client/npm-debug.*
-client/*.jks
-client/*.p8
-client/*.p12
-client/*.key
-client/*.mobileprovision
-client/*.orig.*
-client/web-build/
+node_modules/
+.expo/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
 
 # macOS
 .DS_Store
-client/.DS_Store
 
 # Temporary files created by Metro to check the health of the file watcher
-client/.metro-health-check*
+.metro-health-check*
