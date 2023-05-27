@@ -5,6 +5,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import InitialLand from "./screens/initialLand";
 import NewDB from "./screens/newDB";
+import Home from "./screens/home"
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,7 @@ export default function App() {
         >
           <Stack.Screen name="InitialLand" component={InitialLand} />
           <Stack.Screen name="NewDB" component={NewDB} />
+          <Stack.Screen name="Home" component={Home} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

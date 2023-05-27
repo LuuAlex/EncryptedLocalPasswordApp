@@ -1,3 +1,4 @@
+import React from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -5,11 +6,34 @@ import {
   View,
   Dimensions,
   TouchableOpacity,
+  TextInput,
+  ScrollView,
 } from "react-native";
+import DocumentPicker from "expo-document-picker";
+import { openDatabase } from 'react-native-sqlite-storage';
+import * as SQLite from "expo-sqlite"
 
 export default function NewDB({ navigation }) {
+  const [fileLoc, onChangeFileLoc] = React.useState("");
+  const [value, onChangeText] = React.useState("");
+
+  const pickDocument = async () => {
+    let result = await DocumentPicker.getDocumentAsync({});
+    alert(result.uri);
+    onChangeFileLoc(result);
+  };
+
+  function submit(file) {
+    var db = openDatabase({ name: 'UserDatabase.db', location:file});
+    navigation.navigate("Home", db)
+    console.log(file)
+  }
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      automaticallyAdjustKeyboardInsets={true}
+      contentContainerStyle={styles.container}
+    >
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => navigation.navigate("InitialLand")}
@@ -17,23 +41,44 @@ export default function NewDB({ navigation }) {
         <Text style={styles.nav}>&lt; Back</Text>
       </TouchableOpacity>
       <Text style={styles.h1}>Create a New Password Database</Text>
-      <Text style={styles.p}>Please select a file location for the database and make a master password. Do not forget your master password!</Text>
+      <Text style={styles.p}>
+        Please select a file location for the database and make a master
+        password. Do not forget your master password!
+      </Text>
       <View style={styles.buttonGroup}>
         <View style={styles.button}>
-          <TouchableOpacity style={styles.buttonButton} onPress={null}>
-            <Text style={styles.p}>I need a new password database</Text>
+          <Text style={styles.p}>
+            Step 1: Pick a location (can be a online storage folder) to store
+            your encrypted passwords
+          </Text>
+          <TouchableOpacity style={styles.buttonButton} onPress={pickDocument}>
+            <Text style={styles.p}>Choose Location</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.button}>
+          <Text style={styles.p}>
+            Step 2: Create a strong master password. Do not forget this!
+          </Text>
           <TouchableOpacity style={styles.buttonButton} onPress={null}>
-            <Text style={styles.p}>
-              I already have an existing password database
-            </Text>
+            <TextInput
+              autoCapitalize={"none"}
+              autoComplete={"off"}
+              blurOnSubmit={true}
+              autoCorrect={false}
+              onChangeText={(text) => onChangeText(text)}
+              value={value}
+              style={styles.p}
+            ></TextInput>
           </TouchableOpacity>
         </View>
       </View>
+      <View style={styles.button}>
+        <TouchableOpacity style={styles.buttonButton} onPress={() => submit(fileLoc)}>
+          <Text style={styles.p}>SUBMIT</Text>
+        </TouchableOpacity>
+      </View>
       <StatusBar style="auto" />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -60,33 +105,35 @@ const styles = StyleSheet.create({
   },
   h1: {
     marginTop: height * 0.12,
+    marginBottom: height * 0.02,
     marginHorizontal: width * 0.02,
     fontFamily: "Helvetica",
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 40,
+    fontSize: 35,
     textAlign: "center",
   },
   p: {
-    marginVertical: height * 0.02,
+    marginVertical: height * 0.004,
     marginHorizontal: width * 0.05,
     fontFamily: "Helvetica",
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 25,
+    fontSize: 20,
     textAlign: "center",
   },
   buttonGroup: {
     marginTop: height * 0.05,
   },
   button: {
-    marginVertical: height * 0.02,
+    marginVertical: height * 0.015,
     marginHorizontal: width * 0.05,
   },
   buttonButton: {
-    borderWidth: 8,
+    marginVertical: height * 0.01,
+    borderWidth: 5,
     borderStyle: "solid",
-    borderRadius: 25,
+    borderRadius: 10,
     borderColor: "#fff",
     backgroundColor: "#4e4e56",
   },
