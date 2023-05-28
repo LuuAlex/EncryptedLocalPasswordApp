@@ -9,24 +9,44 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
-import DocumentPicker from "expo-document-picker";
-import { openDatabase } from 'react-native-sqlite-storage';
-import * as SQLite from "expo-sqlite"
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import { openDatabase } from "react-native-sqlite-storage";
+import * as SQLite from "expo-sqlite";
+import * as Asset from "expo-asset"
 
 export default function NewDB({ navigation }) {
   const [fileLoc, onChangeFileLoc] = React.useState("");
   const [value, onChangeText] = React.useState("");
 
-  const pickDocument = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
-    alert(result.uri);
-    onChangeFileLoc(result);
+  const pickDirectory = async () => {
+    console.log("hi!!!!!");
+    try {
+      const permission = await FileSystem.requestDirectoryPermissionsAsync();
+      if (permission.granted) {
+        const dir =
+          await FileSystem.StorageAccessFramework.browseForFolderAsync();
+        console.log(dir);
+      }
+    } catch (error) {
+      console.log("error");
+    }
   };
 
-  function submit(file) {
-    var db = openDatabase({ name: 'UserDatabase.db', location:file});
-    navigation.navigate("Home", db)
-    console.log(file)
+  async function submit(file) {
+    const fileUri = `${FileSystem.documentDirectory}UserDatabase.db`;
+    const downloadedFile = await FileSystem.downloadAsync(
+      Asset.fromModule(SQLite.openDatabase("UserDatabase.db")).uri,
+      fileUri
+    );
+    if (downloadedFile.status != 200) {
+      handleError();
+    }
+
+    const UTI = "public.item";
+    const shareResult = await Sharing.shareAsync(downloadedFile.uri, { UTI });
+    navigation.navigate("Home", db);
+    console.log(file);
   }
 
   return (
@@ -51,7 +71,7 @@ export default function NewDB({ navigation }) {
             Step 1: Pick a location (can be a online storage folder) to store
             your encrypted passwords
           </Text>
-          <TouchableOpacity style={styles.buttonButton} onPress={pickDocument}>
+          <TouchableOpacity style={styles.buttonButton} onPress={pickDirectory}>
             <Text style={styles.p}>Choose Location</Text>
           </TouchableOpacity>
         </View>
@@ -73,7 +93,10 @@ export default function NewDB({ navigation }) {
         </View>
       </View>
       <View style={styles.button}>
-        <TouchableOpacity style={styles.buttonButton} onPress={() => submit(fileLoc)}>
+        <TouchableOpacity
+          style={styles.buttonButton}
+          onPress={() => submit(fileLoc)}
+        >
           <Text style={styles.p}>SUBMIT</Text>
         </TouchableOpacity>
       </View>
