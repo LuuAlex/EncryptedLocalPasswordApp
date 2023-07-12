@@ -9,14 +9,13 @@ import {
   ScrollView,
   StatusBar,
 } from "react-native";
-import RNFS from "react-native-fs"
 import DocumentPicker from "react-native-document-picker";
-
+var RNFS = require('react-native-fs');
 
 export default function NewDB({ navigation }) {
 
   const [fileLoc, setFileLoc] = React.useState("");
-  const [fileName, setFileName] = React.useState("Choose Location");
+  const [fileName, setFileName] = React.useState("Choose Folder");
   const [value, setText] = React.useState("");
 
   const pickDirectory = async () => {
@@ -25,7 +24,8 @@ export default function NewDB({ navigation }) {
         allowMultiSelection: false,
       });
       setFileLoc(response.uri);
-      setFileName(response.name);
+      const ary = response.uri.split("/")
+      setFileName(ary[ary.length - 2]);
     } catch (err) {
       console.warn(err);
     }
@@ -33,10 +33,12 @@ export default function NewDB({ navigation }) {
 
   async function submit() {
     try {
-      const fileUri1 = `${fileLoc}/LocalPasswordStorageDATA/usrData.txt`;
+      const fileUri1 = `${fileLoc}/LocalPasswordStorageDATA/user.txt`;
       const fileUri2 = `${fileLoc}/LocalPasswordStorageDATA/salt.txt`;
+      await RNFS.mkdir(`${fileLoc}/LocalPasswordStorageDATA`);
       await RNFS.writeFile(fileUri1, "");
       await RNFS.writeFile(fileUri2, "");
+      console.log("Created files");
     } catch {
       console.log("Error saving password");
     }
