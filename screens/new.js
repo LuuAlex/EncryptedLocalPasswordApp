@@ -1,4 +1,5 @@
 import React from 'react';
+import Encryption from '../encryption_tools/encryption.js'
 import {
   StyleSheet,
   Text,
@@ -9,7 +10,6 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import {StackActions, NavigationActions} from 'react-navigation';
 var RNFS = require('react-native-fs');
 
 export default function New({navigation}) {
@@ -22,14 +22,16 @@ export default function New({navigation}) {
   async function submit() {
     try {
       const fileUri1 = `${dataLoc}/user.txt`;
-      const existingData = await RNFS.readFile(fileUri1);
-      await RNFS.writeFile(
-        fileUri1,
-        `${existingData}${name}\n${value1}\n${value2}\n\n`,
-      );
+      const fileUri2 = `${dataLoc}/salt.txt`;
+      const existingDataE = await RNFS.readFile(fileUri1);
+      const salt = await RNFS.readFile(fileUri2);
+      const hashInfo = Encryption.hash("123", salt);
+      const existingDATA = Encryption.decrypt(existingDataE, hashInfo);
+      const newData = Encryption.encrypt(`${existingDATA}${name}\n${value1}\n${value2}\n\n`, hashInfo);
+      await RNFS.writeFile(fileUri1, newData);
       console.log('wrote new password');
     } catch {
-      console.log('error create new password password');
+      console.log('error create new password');
     }
     navigation.navigate('Home');
   }

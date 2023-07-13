@@ -1,4 +1,5 @@
 import React from "react";
+import Encryption from '../encryption_tools/encryption.js'
 import {
   StyleSheet,
   Text,
@@ -37,13 +38,16 @@ export default function NewDB({ navigation }) {
       const fileUri1 = `${fileUri}/user.txt`;
       const fileUri2 = `${fileUri}/salt.txt`;
       await RNFS.mkdir(`${fileLoc}/LocalPasswordStorageDATA`);
+      //const hashInfo = Encryption.hash(value, false);
+      //await RNFS.writeFile(fileUri1, Encryption.encrypt("", hashInfo));
+      //await RNFS.writeFile(fileUri2, hashInfo);
       await RNFS.writeFile(fileUri1, "");
       await RNFS.writeFile(fileUri2, "");
       console.log("Created files");
     } catch {
       console.log("Error creating files");
     }
-    navigation.navigate("Home");
+    navigation.navigate("Home", { password: "test" });
   }
 
   return (

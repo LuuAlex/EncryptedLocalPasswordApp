@@ -1,4 +1,5 @@
 import React from 'react';
+import Encryption from '../encryption_tools/encryption.js'
 import {
   StyleSheet,
   Text,
@@ -11,20 +12,23 @@ import {
   UseState,
   RefreshControl,
 } from 'react-native';
-import {StackActions, NavigationActions} from 'react-navigation';
 var RNFS = require('react-native-fs');
 
-export default function Home({navigation}) {
+export default function Home({ navigation }) {
   const [refreshing, setRefreshing] = React.useState(false);
   const [data, setData] = React.useState(null);
   const dataLoc = `${RNFS.DocumentDirectoryPath}/LocalPasswordStorageDATA`;
   readFile();
 
   async function readFile() {
-    const dataLoc = `${RNFS.DocumentDirectoryPath}/LocalPasswordStorageDATA`;
-    var content = await RNFS.readFile(`${dataLoc}/user.txt`, 'utf8');
-    setData(content);
-    return content;
+    const fileUri1 = `${dataLoc}/user.txt`;
+    const fileUri2 = `${dataLoc}/salt.txt`;
+    const salt = await RNFS.readFile(fileUri2);
+    const hashInfo = Encryption.hash("123", salt);
+    var content = await RNFS.readFile(fileUri1, 'utf8');
+    var dContent = Encryption.decrypt(content, hashInfo);
+    setData(dContent);
+    return dContent;
   }
 
   const onRefresh = React.useCallback(() => {
