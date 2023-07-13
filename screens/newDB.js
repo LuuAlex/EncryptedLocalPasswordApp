@@ -23,7 +23,7 @@ export default function NewDB({ navigation }) {
       const response = await DocumentPicker.pickDirectory({
         allowMultiSelection: false,
       });
-      setFileLoc(response.uri);
+      setFileLoc(RNFS.DocumentDirectoryPath); // OLD arg: response.uri
       const ary = response.uri.split("/")
       setFileName(ary[ary.length - 2]);
     } catch (err) {
@@ -32,16 +32,18 @@ export default function NewDB({ navigation }) {
   };
 
   async function submit() {
+    const fileUri = `${fileLoc}/LocalPasswordStorageDATA`;
     try {
-      const fileUri1 = `${fileLoc}/LocalPasswordStorageDATA/user.txt`;
-      const fileUri2 = `${fileLoc}/LocalPasswordStorageDATA/salt.txt`;
+      const fileUri1 = `${fileUri}/user.txt`;
+      const fileUri2 = `${fileUri}/salt.txt`;
       await RNFS.mkdir(`${fileLoc}/LocalPasswordStorageDATA`);
       await RNFS.writeFile(fileUri1, "");
       await RNFS.writeFile(fileUri2, "");
       console.log("Created files");
     } catch {
-      console.log("Error saving password");
+      console.log("Error creating files");
     }
+    navigation.navigate("Home");
   }
 
   return (

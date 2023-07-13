@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,66 +8,107 @@ import {
   TextInput,
   ScrollView,
   StatusBar,
-} from "react-native";
+  UseState,
+  RefreshControl,
+} from 'react-native';
+import {StackActions, NavigationActions} from 'react-navigation';
+var RNFS = require('react-native-fs');
 
-const user = {location: null}
+export default function Home({navigation}) {
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [data, setData] = React.useState(null);
+  const dataLoc = `${RNFS.DocumentDirectoryPath}/LocalPasswordStorageDATA`;
+  readFile();
 
-export default function Home({ navigation }, passInfo) {
+  async function readFile() {
+    const dataLoc = `${RNFS.DocumentDirectoryPath}/LocalPasswordStorageDATA`;
+    var content = await RNFS.readFile(`${dataLoc}/user.txt`, 'utf8');
+    setData(content);
+    return content;
+  }
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
   return (
     <ScrollView
       automaticallyAdjustKeyboardInsets={true}
       contentContainerStyle={styles.container}
-    >
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => navigation.navigate("InitialLand")}
-      >
+        onPress={() => navigation.navigate('New')}>
         <Text style={styles.nav}>&#xFF0B; New</Text>
       </TouchableOpacity>
+      <Text style={styles.h1}>Saved Credentials</Text>
+      <Entry data={data} />
       <StatusBar style="auto" />
     </ScrollView>
   );
 }
 
-var { height, width } = Dimensions.get("window");
+export function Entry(data) {
+  data = data.data;
+  const dataAry = String(data).split('\n\n').slice(0, -1);
+  const rv = dataAry.map(d => (
+    <View style={styles.box}>
+      <Text style={styles.boxP1}>{d.split('\n')[0]}</Text>
+      <Text style={styles.boxP2}>Username: {d.split('\n')[1]}</Text>
+      <Text style={styles.boxP2}>Password: {d.split('\n')[2]}</Text>
+    </View>
+  ));
+  return rv;
+}
+
+async function getData(fileUri) {
+  return await RNFS.readFile(fileUri);
+}
+
+var {height, width} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#da635d",
-    alignItems: "center",
+    backgroundColor: '#da635d',
+    alignItems: 'center',
   },
   navButton: {
-    alignSelf: "flex-start",
-    position: "absolute",
+    alignSelf: 'flex-start',
+    position: 'absolute',
     marginLeft: width * 0.8,
     marginTop: height * 0.061,
   },
   nav: {
-    fontFamily: "Helvetica",
-    color: "#fff",
-    fontWeight: "bold",
+    fontFamily: 'Helvetica',
+    color: '#fff',
+    fontWeight: 'bold',
     fontSize: 18,
-    alignSelf: "flex-start",
-    position: "absolute",
+    alignSelf: 'flex-start',
+    position: 'absolute',
   },
   h1: {
     marginTop: height * 0.12,
     marginBottom: height * 0.02,
     marginHorizontal: width * 0.02,
-    fontFamily: "Helvetica",
-    color: "#fff",
-    fontWeight: "bold",
+    fontFamily: 'Helvetica',
+    color: '#fff',
+    fontWeight: 'bold',
     fontSize: 35,
-    textAlign: "center",
+    textAlign: 'center',
   },
   p: {
     marginVertical: height * 0.004,
     marginHorizontal: width * 0.05,
-    fontFamily: "Helvetica",
-    color: "#fff",
-    fontWeight: "bold",
+    fontFamily: 'Helvetica',
+    color: '#fff',
+    fontWeight: 'bold',
     fontSize: 20,
-    textAlign: "center",
+    textAlign: 'center',
   },
   buttonGroup: {
     marginTop: height * 0.05,
@@ -79,10 +120,39 @@ const styles = StyleSheet.create({
   buttonButton: {
     marginVertical: height * 0.01,
     borderWidth: 5,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     borderRadius: 10,
-    borderColor: "#fff",
-    backgroundColor: "#4e4e56",
+    borderColor: '#fff',
+    backgroundColor: '#4e4e56',
+  },
+  box: {
+    marginVertical: height * 0.01,
+    marginHorizontal: width * 0.01,
+    borderWidth: 3,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    borderColor: '#fff',
+    backgroundColor: '#4e4e56',
+  },
+  boxP1: {
+    marginVertical: height * 0.004,
+    marginHorizontal: width * 0.05,
+    width: width * 0.65,
+    fontFamily: 'Helvetica',
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  boxP2: {
+    marginVertical: height * 0.004,
+    marginHorizontal: width * 0.05,
+    width: width * 0.65,
+    fontFamily: 'Helvetica',
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'left',
   },
 });
 
