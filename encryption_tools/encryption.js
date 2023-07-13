@@ -3,22 +3,35 @@ var CryptoJS = require('crypto-js');
 export default class Encryption {
   constructor() {}
 
+  static makeSalt(length) {
+    let rv = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const totalLength = characters.length;
+    for (let i = 0; i < length; i+=1) {
+      rv += characters.charAt(Math.floor(Math.random() * totalLength));
+    }
+    return rv;
+  }
+
   static hash(password, salt) {
     if (!salt) {
-      salt = CryptoJS.lib.WordArray.random(128 / 8);
+      salt = Encryption.makeSalt(32);
     }
     var key = CryptoJS.PBKDF2(password, salt, {
       keySize: 512 / 32,
       iterations: 1000,
     });
-    return [key, salt];
+    return [key.toString(CryptoJS.enc.Base64), salt];
   }
 
   static encrypt(message, hashed) {
-    return CryptoJS.AES.encrypt(message, hashed[0]).toString();
+    console.log(`encrypt: ${CryptoJS.AES.encrypt(message, hashed[0])}`)
+    console.log(CryptoJS.AES.encrypt(message, hashed[0]))
+    return CryptoJS.AES.encrypt(message, hashed[0]);
   }
 
   static decrypt(message, hashed) {
-    return CryptoJS.AES.decrpy(message, hashed[0].toString(CryptoJS.enc.Utf8));
+    console.log(`dencrypt: ${CryptoJS.AES.decrypt(message, hashed[0])}`)
+    return CryptoJS.AES.decrypt(message, hashed[0]);
   }
 }
