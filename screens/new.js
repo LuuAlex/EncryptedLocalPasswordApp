@@ -88,7 +88,7 @@ export default function New({navigation}) {
       </View>
       <View style={styles.button}>
         <TouchableOpacity style={styles.buttonButton} onPress={submit}>
-          <Text style={styles.p}>SUBMIT</Text>
+          <Text style={styles.p}>Save Password</Text>
         </TouchableOpacity>
       </View>
       <StatusBar style="auto" />
