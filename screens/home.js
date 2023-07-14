@@ -26,7 +26,6 @@ export default function Home({ navigation }) {
     const salt = await RNFS.readFile(fileUri2);
     const hashInfo = Encryption.hash("123", salt);
     var content = await RNFS.readFile(fileUri1);
-    console.log(content)
     var dContent = Encryption.decrypt(content, hashInfo);
     setData(dContent);
     return dContent;

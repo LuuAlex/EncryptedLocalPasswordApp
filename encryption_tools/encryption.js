@@ -13,25 +13,27 @@ export default class Encryption {
     return rv;
   }
 
+  static passCheck(password, salt, hash) {
+    return CryptoJS.SHA3(`${salt}${password}`).toString(CryptoJS.enc.Base64) == hash;
+  }
+
   static hash(password, salt) {
     if (!salt) {
-      salt = Encryption.makeSalt(32);
+      salt = Encryption.makeSalt(64);
     }
     var key = CryptoJS.PBKDF2(password, salt, {
       keySize: 512 / 32,
-      iterations: 1000,
+      iterations: 1394,
     });
-    return [key.toString(CryptoJS.enc.Base64), salt];
+    var hash = CryptoJS.SHA3(`${salt}${password}`).toString(CryptoJS.enc.Base64)
+    return [key.toString(CryptoJS.enc.Base64), salt, hash];
   }
 
   static encrypt(message, hashed) {
-    console.log(`encrypt: ${CryptoJS.AES.encrypt(message, hashed[0])}`)
-    console.log(CryptoJS.AES.encrypt(message, hashed[0]))
-    return CryptoJS.AES.encrypt(message, hashed[0]);
+    return CryptoJS.AES.encrypt(message, hashed[0]).toString();
   }
 
   static decrypt(message, hashed) {
-    console.log(`dencrypt: ${CryptoJS.AES.decrypt(message, hashed[0])}`)
-    return CryptoJS.AES.decrypt(message, hashed[0]);
+    return CryptoJS.AES.decrypt(message, hashed[0]).toString(CryptoJS.enc.Utf8);
   }
 }

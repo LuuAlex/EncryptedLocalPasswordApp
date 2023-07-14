@@ -18,6 +18,7 @@ export default function NewDB({navigation}) {
   const [fileName, setFileName] = React.useState('Choose Folder');
   const [value, setText] = React.useState('');
 
+  /* CHOOSE DIRECTORY
   const pickDirectory = async () => {
     try {
       const response = await DocumentPicker.pickDirectory({
@@ -25,11 +26,12 @@ export default function NewDB({navigation}) {
       }); 
       // setFileLoc(RNFS.DocumentDirectoryPath); // OLD arg: response.uri
       const ary = response.uri.split('/');
-      setFileName(ary[ary.length - 2]);
+      //setFileName(ary[ary.length - 2]);
     } catch (err) {
       console.warn(err);
     }
   };
+  */
 
   async function submit() {
     setFileLoc(RNFS.DocumentDirectoryPath);
@@ -41,14 +43,15 @@ export default function NewDB({navigation}) {
     const fileUri = `${fileLoc}/LocalPasswordStorageDATA`;
     const fileUri1 = `${fileUri}/user.txt`;
     const fileUri2 = `${fileUri}/salt.txt`;
+    const fileUri3 = `${fileUri}/hash.txt`;
     await RNFS.mkdir(`${fileLoc}/LocalPasswordStorageDATA`);
     var hashInfo = Encryption.hash(value, '');
     await RNFS.writeFile(fileUri1, Encryption.encrypt('', hashInfo));
     await RNFS.writeFile(fileUri2, hashInfo[1]);
+    await RNFS.writeFile(fileUri3, hashInfo[2]);
     //await RNFS.writeFile(fileUri1, "");
     //await RNFS.writeFile(fileUri2, "");
     console.log('Created files');
-    console.log('Error creating files');
     navigation.navigate('Home');
   }
 
@@ -63,10 +66,10 @@ export default function NewDB({navigation}) {
       </TouchableOpacity>
       <Text style={styles.h1}>Create a New Password Database</Text>
       <Text style={styles.p}>
-        Please select a file location for the database and make a master
-        password. Do not forget your master password!
+        Please create a master password. Do not forget your master password!
       </Text>
       <View style={styles.buttonGroup}>
+        {/*
         <View style={styles.button}>
           <Text style={styles.p}>
             Step 1: Pick a location (can be a online storage folder) to store
@@ -76,9 +79,10 @@ export default function NewDB({navigation}) {
             <Text style={styles.p}>{fileName}</Text>
           </TouchableOpacity>
         </View>
+        */}
         <View style={styles.button}>
           <Text style={styles.p}>
-            Step 2: Create a strong master password. Do not forget this!
+            Create a strong master password. Do not forget this!
           </Text>
           <TouchableOpacity style={styles.buttonButton} onPress={null}>
             <TextInput
