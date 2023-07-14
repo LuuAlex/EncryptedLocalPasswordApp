@@ -65,7 +65,7 @@ export function Entry(data) {
   data = data.data;
   const dataAry = String(data).split('\n\n').slice(0, -1);
   const rv = dataAry.map(d => (
-    <View style={styles.box}>
+    <View key={d} style={styles.box}>
       <Text style={styles.boxP1}>{d.split('\n')[0]}</Text>
       <Text style={styles.boxP2}>Username: {d.split('\n')[1]}</Text>
       <Text style={styles.boxP2}>Password: {d.split('\n')[2]}</Text>
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   navButton: {
     alignSelf: 'flex-start',
     position: 'absolute',
-    marginLeft: width * 0.8,
+    marginLeft: width * 0.78,
     marginTop: height * 0.061,
   },
   nav: {
