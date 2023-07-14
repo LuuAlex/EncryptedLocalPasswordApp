@@ -10,49 +10,29 @@ import {
   ScrollView,
   StatusBar,
 } from 'react-native';
-import DocumentPicker from 'react-native-document-picker';
 var RNFS = require('react-native-fs');
 
-export default function NewDB({navigation}) {
-  const [fileLoc, setFileLoc] = React.useState('');
-  // const [fileName, setFileName] = React.useState('Choose Folder');
+export default function ExistingDB({navigation}) {
   const [value, setText] = React.useState('');
-
-  /* CHOOSE DIRECTORY
-  const pickDirectory = async () => {
-    try {
-      const response = await DocumentPicker.pickDirectory({
-        allowMultiSelection: false,
-      }); 
-      // setFileLoc(RNFS.DocumentDirectoryPath); // OLD arg: response.uri
-      const ary = response.uri.split('/');
-      //setFileName(ary[ary.length - 2]);
-    } catch (err) {
-      console.warn(err);
-    }
-  };
-  */
+  const [incorrect, setIncorrect] = React.useState('');
+  const [isAlertVisible, setIsAlertVisible] = React.useState(false);
 
   async function submit() {
-    setFileLoc(RNFS.DocumentDirectoryPath);
-    try {
-      RNFS.unlink(`${fileLoc}/`);
-    } catch {
-      console.log('did not delete')
-    }
-    const fileUri = `${fileLoc}/LocalPasswordStorageDATA`;
-    const fileUri1 = `${fileUri}/user.txt`;
+    const fileUri = `${RNFS.DocumentDirectoryPath}/LocalPasswordStorageDATA`;
     const fileUri2 = `${fileUri}/salt.txt`;
     const fileUri3 = `${fileUri}/hash.txt`;
-    await RNFS.mkdir(`${fileLoc}/LocalPasswordStorageDATA`);
-    var hashInfo = Encryption.hash(value, '');
-    await RNFS.writeFile(fileUri1, Encryption.encrypt('', hashInfo));
-    await RNFS.writeFile(fileUri2, hashInfo[1]);
-    await RNFS.writeFile(fileUri3, hashInfo[2]);
-    //await RNFS.writeFile(fileUri1, "");
-    //await RNFS.writeFile(fileUri2, "");
-    console.log('Created files');
-    navigation.navigate('Home', {password: value});
+    const salt = await RNFS.readFile(fileUri2);
+    const hash = await RNFS.readFile(fileUri3);
+    if (!Encryption.passCheck(value, salt, hash)) {
+      setIsAlertVisible(true);
+      setTimeout(() => {
+        setIsAlertVisible(false);
+        }, 2000);
+    } else {
+      console.log('logged in');
+      navigation.navigate('Home', {password: value});
+    }
+
   }
 
   return (
@@ -65,25 +45,14 @@ export default function NewDB({navigation}) {
         onPress={() => navigation.navigate('InitialLand')}>
         <Text style={styles.nav}>&lt; Back</Text>
       </TouchableOpacity>
-      <Text style={styles.h1}>Create a New Password Database</Text>
+      <Text style={styles.h1}>Existing Password Database</Text>
       <Text style={styles.p}>
-        Please create a master password. Do not forget your master password!
+        Please enter your master password. Unfortunately, if you forgot it, there is no way to recover your saved passwords. 
       </Text>
       <View style={styles.buttonGroup}>
-        {/*
         <View style={styles.button}>
           <Text style={styles.p}>
-            Step 1: Pick a location (can be a online storage folder) to store
-            your encrypted passwords
-          </Text>
-          <TouchableOpacity style={styles.buttonButton} onPress={pickDirectory}>
-            <Text style={styles.p}>{fileName}</Text>
-          </TouchableOpacity>
-        </View>
-        */}
-        <View style={styles.button}>
-          <Text style={styles.p}>
-            Create a strong master password. Do not forget this!
+            Enter your master password:
           </Text>
           <TouchableOpacity style={styles.buttonButton} onPress={null}>
             <TextInput
@@ -102,6 +71,9 @@ export default function NewDB({navigation}) {
           <Text style={styles.p}>SUBMIT</Text>
         </TouchableOpacity>
       </View>
+      {isAlertVisible && <Text style={styles.p}>{incorrect}
+        Incorrect Password. Try Again.
+      </Text>}
       <StatusBar style="auto" />
     </ScrollView>
   );

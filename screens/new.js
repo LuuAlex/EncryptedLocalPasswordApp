@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 var RNFS = require('react-native-fs');
 
-export default function New({navigation}) {
+export default function New({route, navigation}) {
+  const { password } = route.params;
   const dataLoc = `${RNFS.DocumentDirectoryPath}/LocalPasswordStorageDATA`;
 
   const [name, setName] = React.useState('');
@@ -25,7 +26,7 @@ export default function New({navigation}) {
       const fileUri2 = `${dataLoc}/salt.txt`;
       const existingDataE = await RNFS.readFile(fileUri1);
       const salt = await RNFS.readFile(fileUri2);
-      const hashInfo = Encryption.hash("123", salt);
+      const hashInfo = Encryption.hash(password, salt);
       const existingDATA = Encryption.decrypt(existingDataE, hashInfo);
       const newData = Encryption.encrypt(`${existingDATA}${name}\n${value1}\n${value2}\n\n`, hashInfo);
       await RNFS.writeFile(fileUri1, newData);
@@ -33,13 +34,14 @@ export default function New({navigation}) {
     } catch {
       console.log('error create new password');
     }
-    navigation.navigate('Home');
+    navigation.navigate('Home', {password: password});
   }
 
   return (
     <ScrollView
       automaticallyAdjustKeyboardInsets={true}
-      contentContainerStyle={styles.container}>
+      contentContainerStyle={styles.container}
+      style={{backgroundColor:'#da635d'}}>
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => navigation.goBack('Home')}>

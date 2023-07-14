@@ -4,10 +4,10 @@ import {
   View,
   Dimensions,
   TouchableOpacity,
-  StatusBar
-} from "react-native";
+  StatusBar,
+} from 'react-native';
 
-export default function InitialLand({ navigation }) {
+export default function InitialLand({navigation}) {
   return (
     <View style={styles.container}>
       <Text style={styles.h1}>Encrypted Local Password Manager</Text>
@@ -16,13 +16,14 @@ export default function InitialLand({ navigation }) {
         <View style={styles.button}>
           <TouchableOpacity
             style={styles.buttonButton}
-            onPress={() => navigation.navigate("NewDB")}
-          >
+            onPress={() => navigation.navigate('NewDB')}>
             <Text style={styles.p}>I need a new password database</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.button}>
-          <TouchableOpacity style={styles.buttonButton} onPress={null}>
+          <TouchableOpacity
+            style={styles.buttonButton}
+            onPress={() => navigation.navigate('ExistingDB')}>
             <Text style={styles.p}>
               I already have an existing password database
             </Text>
@@ -34,30 +35,30 @@ export default function InitialLand({ navigation }) {
   );
 }
 
-var { height, width } = Dimensions.get("window");
+var {height, width} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#da635d",
-    alignItems: "center",
+    backgroundColor: '#da635d',
+    alignItems: 'center',
   },
   h1: {
     marginTop: height * 0.16,
     marginHorizontal: width * 0.02,
-    fontFamily: "Helvetica",
-    color: "#fff",
-    fontWeight: "bold",
+    fontFamily: 'Helvetica',
+    color: '#fff',
+    fontWeight: 'bold',
     fontSize: 40,
-    textAlign: "center",
+    textAlign: 'center',
   },
   p: {
     marginVertical: height * 0.025,
     marginHorizontal: width * 0.05,
-    fontFamily: "Helvetica",
-    color: "#fff",
-    fontWeight: "bold",
+    fontFamily: 'Helvetica',
+    color: '#fff',
+    fontWeight: 'bold',
     fontSize: 25,
-    textAlign: "center",
+    textAlign: 'center',
   },
   buttonGroup: {
     marginTop: height * 0.05,
@@ -68,10 +69,10 @@ const styles = StyleSheet.create({
   },
   buttonButton: {
     borderWidth: 8,
-    borderStyle: "solid",
+    borderStyle: 'solid',
     borderRadius: 25,
-    borderColor: "#fff",
-    backgroundColor: "#4e4e56",
+    borderColor: '#fff',
+    backgroundColor: '#4e4e56',
   },
 });
 

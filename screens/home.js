@@ -14,7 +14,9 @@ import {
 } from 'react-native';
 var RNFS = require('react-native-fs');
 
-export default function Home({ navigation }) {
+export default function Home({ route, navigation }) {
+  const { password } = route.params;
+
   const [refreshing, setRefreshing] = React.useState(false);
   const [data, setData] = React.useState(null);
   const dataLoc = `${RNFS.DocumentDirectoryPath}/LocalPasswordStorageDATA`;
@@ -24,7 +26,7 @@ export default function Home({ navigation }) {
     const fileUri1 = `${dataLoc}/user.txt`;
     const fileUri2 = `${dataLoc}/salt.txt`;
     const salt = await RNFS.readFile(fileUri2);
-    const hashInfo = Encryption.hash("123", salt);
+    const hashInfo = Encryption.hash(password, salt);
     var content = await RNFS.readFile(fileUri1);
     var dContent = Encryption.decrypt(content, hashInfo);
     setData(dContent);
@@ -42,16 +44,18 @@ export default function Home({ navigation }) {
     <ScrollView
       automaticallyAdjustKeyboardInsets={true}
       contentContainerStyle={styles.container}
+      style={{backgroundColor:'#da635d'}}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
       <TouchableOpacity
         style={styles.navButton}
-        onPress={() => navigation.navigate('New')}>
+        onPress={() => navigation.navigate('New', {password: password})}>
         <Text style={styles.nav}>&#xFF0B; New</Text>
       </TouchableOpacity>
       <Text style={styles.h1}>Saved Credentials</Text>
       <Entry data={data} />
+      <View style={{marginVertical:20}}></View>
       <StatusBar style="auto" />
     </ScrollView>
   );
@@ -77,7 +81,7 @@ async function getData(fileUri) {
 var {height, width} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#da635d',
     alignItems: 'center',
   },

@@ -7,6 +7,7 @@ import InitialLand from "./screens/initialLand";
 import NewDB from "./screens/newDB";
 import Home from "./screens/home";
 import New from "./screens/new";
+import ExistingDB from "./screens/existingDB"
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
           <Stack.Screen name="NewDB" component={NewDB} />
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="New" component={New} />
+          <Stack.Screen name="ExistingDB" component={ExistingDB} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
