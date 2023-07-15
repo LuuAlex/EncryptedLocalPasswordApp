@@ -1,4 +1,5 @@
 import React from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import Encryption from '../encryption_tools/encryption.js';
 import {
   StyleSheet,
@@ -6,8 +7,6 @@ import {
   View,
   Dimensions,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  TextInput,
   ScrollView,
   StatusBar,
   RefreshControl,
@@ -21,7 +20,13 @@ export default function Home({route, navigation}) {
   const [refreshing, setRefreshing] = React.useState(false);
   const [data, setData] = React.useState({});
   const dataLoc = `${RNFS.DocumentDirectoryPath}/LocalPasswordStorageDATA`;
-  readFile();
+
+  // runs once for every focus
+  useFocusEffect(
+    React.useCallback(() => {
+      readFile();
+    }, [])
+  );
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [d, setD] = React.useState(false);
@@ -34,9 +39,10 @@ export default function Home({route, navigation}) {
     const hashInfo = Encryption.hash(password, salt);
     var content = await RNFS.readFile(fileUri1);
     var dContent = Encryption.decrypt(content, hashInfo);
-    var parsed = JSON.parse(dContent)
-    setData(parsed)
-    return dContent;
+    var parsed = JSON.parse(dContent);
+    if (parsed != data) {
+      setData(parsed);
+    }
   }
 
   function modal(d) {
@@ -66,7 +72,33 @@ export default function Home({route, navigation}) {
       </TouchableOpacity>
       <Text style={styles.h1}>Saved Credentials</Text>
       <Text style={styles.p}>Click an account to see details.</Text>
-      {modalVisible && <Modal
+      <ModalP modalVisible={modalVisible} setModalVisible={setModalVisible} data={data} d={d} />
+      <View style={styles.p}></View>
+      <View style={styles.p}></View>
+      <Entry data={data} modal={x => modal(x)} />
+      <View style={{marginVertical: 20}}></View>
+      <StatusBar style="auto" />
+    </ScrollView>
+  );
+}
+
+export function Entry({data, modal}) {
+  const rv = Object.keys(data).map(d => (
+    <TouchableOpacity key={d} style={styles.box} onPress={() => modal(d)}>
+      <Text style={styles.boxP1}>{data[d].name}</Text>
+      {/* 
+      <Text style={styles.boxP2}>Username: {d.split('\n')[1]}</Text>
+      <Text style={styles.boxP2}>Password: {d.split('\n')[2]}</Text>
+      */}
+    </TouchableOpacity>
+  ));
+  return rv;
+}
+
+export function ModalP({modalVisible, setModalVisible, data, d}) {
+  if (modalVisible) {
+    return (
+      <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -87,30 +119,9 @@ export default function Home({route, navigation}) {
           <View style={styles.h1}></View>
           <View style={styles.p}></View>
         </View>
-      </Modal>}
-      <View style={styles.p}></View>
-      <View style={styles.p}></View>
-      <Entry data={data} modal={x => modal(x)} />
-      <View style={{marginVertical: 20}}></View>
-      <StatusBar style="auto" />
-    </ScrollView>
-  );
-}
-
-export function Entry({data, modal}) {
-  const rv = Object.keys(data).map(d => (
-    <TouchableOpacity
-      key={d}
-      style={styles.box}
-      onPress={() => modal(d)}>
-      <Text style={styles.boxP1}>{data[d].name}</Text>
-      {/* 
-      <Text style={styles.boxP2}>Username: {d.split('\n')[1]}</Text>
-      <Text style={styles.boxP2}>Password: {d.split('\n')[2]}</Text>
-      */}
-    </TouchableOpacity>
-  ));
-  return rv;
+      </Modal>
+    );
+  }
 }
 
 var {height, width} = Dimensions.get('window');

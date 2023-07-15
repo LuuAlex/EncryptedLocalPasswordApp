@@ -10,7 +10,7 @@ import {
   ScrollView,
   StatusBar,
 } from 'react-native';
-import DocumentPicker from 'react-native-document-picker';
+// import DocumentPicker from 'react-native-document-picker';
 var RNFS = require('react-native-fs');
 
 export default function NewDB({navigation}) {
@@ -51,8 +51,7 @@ export default function NewDB({navigation}) {
     await RNFS.writeFile(fileUri1, Encryption.encrypt(`{}`, hashInfo));
     await RNFS.writeFile(fileUri2, hashInfo[1]);
     await RNFS.writeFile(fileUri3, hashInfo[2]);
-    //await RNFS.writeFile(fileUri1, "");
-    //await RNFS.writeFile(fileUri2, "");
+
     navigation.navigate('Home', {password: value});
   }
 

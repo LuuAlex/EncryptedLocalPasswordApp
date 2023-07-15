@@ -10,14 +10,14 @@ import {
 export default function InitialLand({navigation}) {
   return (
     <View style={styles.container}>
-      <Text style={styles.h1}>Encrypted Local Password Manager</Text>
+      <Text style={styles.h1}>Local Password Storage</Text>
       <Text style={styles.p}>Please make a selection below:</Text>
       <View style={styles.buttonGroup}>
         <View style={styles.button}>
           <TouchableOpacity
             style={styles.buttonButton}
             onPress={() => navigation.navigate('NewDB')}>
-            <Text style={styles.p}>I need a new password database</Text>
+            <Text style={styles.p}>I need a new password vault</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.button}>
@@ -25,7 +25,7 @@ export default function InitialLand({navigation}) {
             style={styles.buttonButton}
             onPress={() => navigation.navigate('ExistingDB')}>
             <Text style={styles.p}>
-              I already have an existing password database
+              I already have an existing password vault
             </Text>
           </TouchableOpacity>
         </View>
