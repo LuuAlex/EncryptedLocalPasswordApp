@@ -72,7 +72,7 @@ export default function Home({route, navigation}) {
       </TouchableOpacity>
       <Text style={styles.h1}>Saved Credentials</Text>
       <Text style={styles.p}>Click an account to see details.</Text>
-      <ModalP modalVisible={modalVisible} setModalVisible={setModalVisible} data={data} d={d} />
+      <ModalP modalVisible={modalVisible} setModalVisible={setModalVisible} data={data} d={d} navigation={navigation} password={password}/>
       <View style={styles.p}></View>
       <View style={styles.p}></View>
       <Entry data={data} modal={x => modal(x)} />
@@ -95,7 +95,12 @@ export function Entry({data, modal}) {
   return rv;
 }
 
-export function ModalP({modalVisible, setModalVisible, data, d}) {
+export function ModalP({modalVisible, setModalVisible, data, d, navigation, password}) {
+  function edit() {
+    setModalVisible(false);
+    navigation.navigate("Edit",  {password:password, data:data, d:d });
+  }
+
   if (modalVisible) {
     return (
       <Modal
@@ -116,8 +121,14 @@ export function ModalP({modalVisible, setModalVisible, data, d}) {
             <Text style={styles.boxEP2}>Username: {data[d].user}</Text>
             <Text style={styles.boxEP2}>Password: {data[d].pass}</Text>
           </View>
-          <View style={styles.h1}></View>
           <View style={styles.p}></View>
+          <View style={styles.p}></View>
+          <TouchableOpacity
+            style={styles.close}
+            onPress={() => edit()}>
+            <Text style={styles.mnav}>&#x270E; Edit</Text>
+          </TouchableOpacity>
+          <View style={styles.h1}></View>
         </View>
       </Modal>
     );
@@ -134,14 +145,14 @@ const styles = StyleSheet.create({
   navButton: {
     alignSelf: 'flex-start',
     position: 'absolute',
-    marginLeft: width * 0.78,
+    marginLeft: width * 0.75,
     marginTop: height * 0.061,
   },
   nav: {
     fontFamily: 'Helvetica',
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
     alignSelf: 'flex-start',
     position: 'absolute',
   },

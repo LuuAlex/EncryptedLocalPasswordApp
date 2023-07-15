@@ -12,36 +12,27 @@ import {
 } from 'react-native';
 var RNFS = require('react-native-fs');
 
-export default function New({route, navigation}) {
-  const {password} = route.params;
+export default function Edit({route, navigation}) {
+  const {password, data, d} = route.params;
   const dataLoc = `${RNFS.DocumentDirectoryPath}/LocalPasswordStorageDATA`;
 
-  const [name, setName] = React.useState('');
-  const [value1, setText1] = React.useState('');
-  const [value2, setText2] = React.useState('');
+  const [name, setName] = React.useState(data[d].name);
+  const [value1, setText1] = React.useState(data[d].user);
+  const [value2, setText2] = React.useState(data[d].pass);
 
   async function submit() {
     try {
       const fileUri1 = `${dataLoc}/user.txt`;
       const fileUri2 = `${dataLoc}/salt.txt`;
 
-      const existingDataE = await RNFS.readFile(fileUri1);
       const salt = await RNFS.readFile(fileUri2);
       const hashInfo = Encryption.hash(password, salt);
 
-      const existingDATA = Encryption.decrypt(existingDataE, hashInfo);
-      const existingJSON = JSON.parse(existingDATA);
-      const len = Object.keys(existingJSON).length;
-      existingJSON[`${name.length}+${randomString(15)}id${len}`] = {
-        name: name,
-        user: value1,
-        pass: value2,
-      };
+      data[d].name = name;
+      data[d].user = value1;
+      data[d].pass = value2;
 
-      const newData = Encryption.encrypt(
-        JSON.stringify(existingJSON),
-        hashInfo,
-      );
+      const newData = Encryption.encrypt(JSON.stringify(data), hashInfo);
       await RNFS.writeFile(fileUri1, newData);
     } catch {
       console.log('error create new password');
@@ -49,15 +40,22 @@ export default function New({route, navigation}) {
     navigation.navigate('Home', {password: password});
   }
 
-  function randomString(length) {
-    let rv = '';
-    const characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const totalLength = characters.length;
-    for (let i = 0; i < length; i += 1) {
-      rv += characters.charAt(Math.floor(Math.random() * totalLength));
+  async function deleteP() {
+    try {
+      const fileUri1 = `${dataLoc}/user.txt`;
+      const fileUri2 = `${dataLoc}/salt.txt`;
+
+      const salt = await RNFS.readFile(fileUri2);
+      const hashInfo = Encryption.hash(password, salt);
+
+      delete data[d];
+
+      const newData = Encryption.encrypt(JSON.stringify(data), hashInfo);
+      await RNFS.writeFile(fileUri1, newData);
+    } catch {
+      console.log('error delete');
     }
-    return rv;
+    navigation.navigate('Home', {password: password});
   }
 
   return (
@@ -68,13 +66,15 @@ export default function New({route, navigation}) {
       <TouchableOpacity
         style={styles.navButton}
         onPress={() => navigation.goBack('Home')}>
-        <Text style={styles.nav}>&lt; Back</Text>
+        <Text style={styles.nav}>&lt; Cancel</Text>
       </TouchableOpacity>
-      <Text style={styles.h1}>Add New Credentials</Text>
-      <Text style={styles.p}></Text>
+      <TouchableOpacity style={styles.navButton2} onPress={() => deleteP()}>
+        <Text style={styles.nav}>&#x2715; DELETE</Text>
+      </TouchableOpacity>
+      <Text style={styles.h1}>Edit Credentials</Text>
       <View style={styles.buttonGroup}>
         <View style={styles.button}>
-          <Text style={styles.p}>Enter account name:</Text>
+          <Text style={styles.p}>Edit account name:</Text>
           <TouchableOpacity style={styles.buttonButton} onPress={null}>
             <TextInput
               autoCapitalize={'none'}
@@ -87,7 +87,7 @@ export default function New({route, navigation}) {
           </TouchableOpacity>
         </View>
         <View style={styles.button}>
-          <Text style={styles.p}>Enter username:</Text>
+          <Text style={styles.p}>Edit username:</Text>
           <TouchableOpacity style={styles.buttonButton} onPress={null}>
             <TextInput
               autoCapitalize={'none'}
@@ -100,7 +100,7 @@ export default function New({route, navigation}) {
           </TouchableOpacity>
         </View>
         <View style={styles.button}>
-          <Text style={styles.p}>Enter password:</Text>
+          <Text style={styles.p}>Edit password:</Text>
           <TouchableOpacity style={styles.buttonButton} onPress={null}>
             <TextInput
               autoCapitalize={'none'}
@@ -115,7 +115,7 @@ export default function New({route, navigation}) {
       </View>
       <View style={styles.button}>
         <TouchableOpacity style={styles.buttonButton} onPress={submit}>
-          <Text style={styles.p}>Save Credentials</Text>
+          <Text style={styles.p}>Save Changes</Text>
         </TouchableOpacity>
       </View>
       <StatusBar style="auto" />
@@ -134,6 +134,12 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     position: 'absolute',
     marginLeft: width * 0.06,
+    marginTop: height * 0.065,
+  },
+  navButton2: {
+    alignSelf: 'flex-start',
+    position: 'absolute',
+    marginLeft: width * 0.69,
     marginTop: height * 0.065,
   },
   nav: {
