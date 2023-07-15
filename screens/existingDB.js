@@ -29,7 +29,6 @@ export default function ExistingDB({navigation}) {
         setIsAlertVisible(false);
         }, 2000);
     } else {
-      console.log('logged in');
       navigation.navigate('Home', {password: value});
     }
 

@@ -19,7 +19,7 @@ export default function Home({route, navigation}) {
   const {password} = route.params;
 
   const [refreshing, setRefreshing] = React.useState(false);
-  const [data, setData] = React.useState(null);
+  const [data, setData] = React.useState({});
   const dataLoc = `${RNFS.DocumentDirectoryPath}/LocalPasswordStorageDATA`;
   readFile();
 
@@ -29,11 +29,13 @@ export default function Home({route, navigation}) {
   async function readFile() {
     const fileUri1 = `${dataLoc}/user.txt`;
     const fileUri2 = `${dataLoc}/salt.txt`;
+
     const salt = await RNFS.readFile(fileUri2);
     const hashInfo = Encryption.hash(password, salt);
     var content = await RNFS.readFile(fileUri1);
     var dContent = Encryption.decrypt(content, hashInfo);
-    setData(dContent);
+    var parsed = JSON.parse(dContent)
+    setData(parsed)
     return dContent;
   }
 
@@ -64,12 +66,11 @@ export default function Home({route, navigation}) {
       </TouchableOpacity>
       <Text style={styles.h1}>Saved Credentials</Text>
       <Text style={styles.p}>Click an account to see details.</Text>
-      <Modal
+      {modalVisible && <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          console.log('Modal has been closed.');
           setModalVisible(!modalVisible);
         }}>
         <View style={styles.modalStyle}>
@@ -79,14 +80,14 @@ export default function Home({route, navigation}) {
             <Text style={styles.mnav}>&#x2715; Close</Text>
           </TouchableOpacity>
           <View style={styles.ebox}>
-            <Text style={styles.boxEP1}>{d[0]}</Text>
-            <Text style={styles.boxEP2}>Username: {d[1]}</Text>
-            <Text style={styles.boxEP2}>Password: {d[2]}</Text>
+            <Text style={styles.boxEP1}>{data[d].name}</Text>
+            <Text style={styles.boxEP2}>Username: {data[d].user}</Text>
+            <Text style={styles.boxEP2}>Password: {data[d].pass}</Text>
           </View>
           <View style={styles.h1}></View>
           <View style={styles.p}></View>
         </View>
-      </Modal>
+      </Modal>}
       <View style={styles.p}></View>
       <View style={styles.p}></View>
       <Entry data={data} modal={x => modal(x)} />
@@ -97,13 +98,12 @@ export default function Home({route, navigation}) {
 }
 
 export function Entry({data, modal}) {
-  const dataAry = String(data).split('\n\n').slice(0, -1);
-  const rv = dataAry.map(d => (
+  const rv = Object.keys(data).map(d => (
     <TouchableOpacity
       key={d}
       style={styles.box}
-      onPress={() => modal(d.split('\n'))}>
-      <Text style={styles.boxP1}>{d.split('\n')[0]}</Text>
+      onPress={() => modal(d)}>
+      <Text style={styles.boxP1}>{data[d].name}</Text>
       {/* 
       <Text style={styles.boxP2}>Username: {d.split('\n')[1]}</Text>
       <Text style={styles.boxP2}>Password: {d.split('\n')[2]}</Text>

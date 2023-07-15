@@ -24,13 +24,18 @@ export default function New({route, navigation}) {
     try {
       const fileUri1 = `${dataLoc}/user.txt`;
       const fileUri2 = `${dataLoc}/salt.txt`;
+
       const existingDataE = await RNFS.readFile(fileUri1);
       const salt = await RNFS.readFile(fileUri2);
       const hashInfo = Encryption.hash(password, salt);
+
       const existingDATA = Encryption.decrypt(existingDataE, hashInfo);
-      const newData = Encryption.encrypt(`${existingDATA}${name}\n${value1}\n${value2}\n\n`, hashInfo);
+      const existingJSON = JSON.parse(existingDATA);
+      const len = Object.keys(existingJSON).length;
+      existingJSON[`id${len}`] = {name:name, user:value1, pass:value2};
+
+      const newData = Encryption.encrypt(JSON.stringify(existingJSON), hashInfo);
       await RNFS.writeFile(fileUri1, newData);
-      console.log('wrote new password');
     } catch {
       console.log('error create new password');
     }

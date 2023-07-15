@@ -40,18 +40,19 @@ export default function NewDB({navigation}) {
     } catch {
       console.log('did not delete')
     }
+
     const fileUri = `${fileLoc}/LocalPasswordStorageDATA`;
     const fileUri1 = `${fileUri}/user.txt`;
     const fileUri2 = `${fileUri}/salt.txt`;
     const fileUri3 = `${fileUri}/hash.txt`;
+    
     await RNFS.mkdir(`${fileLoc}/LocalPasswordStorageDATA`);
     var hashInfo = Encryption.hash(value, '');
-    await RNFS.writeFile(fileUri1, Encryption.encrypt('', hashInfo));
+    await RNFS.writeFile(fileUri1, Encryption.encrypt(`{}`, hashInfo));
     await RNFS.writeFile(fileUri2, hashInfo[1]);
     await RNFS.writeFile(fileUri3, hashInfo[2]);
     //await RNFS.writeFile(fileUri1, "");
     //await RNFS.writeFile(fileUri2, "");
-    console.log('Created files');
     navigation.navigate('Home', {password: value});
   }
 
