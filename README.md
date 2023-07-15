@@ -8,6 +8,13 @@ Important data for recovering saved passwords are stored in a folder called "Loc
 * **salt.txt**: Saves the randomly created 64-character salt.
 * **user.txt**: Stores encrypted passwords. Encrypted using **AES**. The key used for encryption is created using the master password and the salt, using the **PBKDF2** algorithm. This key is not stored on the device.
 
+# Features:
+* Each entry consists of an account name, username, and password
+* Every part of an entry is encrypted
+* Entries can be edited and deleted
+* For privacy, only account names show on the home page; click to show more details for each account
+* Passwords must be re-inputted for app restart
+
 ## Future Updates:
-* Option to save password data in any folder of the user's choosing.
-* Android Support 
+* Option to save password data in any folder of the user's choosing, including cloud storage drives like iCloud, OneDrive, and Google Drive
+* Support for Android Devices
