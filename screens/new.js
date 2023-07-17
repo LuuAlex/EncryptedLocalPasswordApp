@@ -32,7 +32,7 @@ export default function New({route, navigation}) {
       const existingDATA = Encryption.decrypt(existingDataE, hashInfo);
       const existingJSON = JSON.parse(existingDATA);
       const len = Object.keys(existingJSON).length;
-      existingJSON[`${name}${name.length}+${randomString(15)}id${len}`] = {
+      existingJSON[`${name}${name.length}+${randomString(10)}id${len}`] = {
         name: name,
         user: value1,
         pass: value2,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import Encryption from '../encryption_tools/encryption.js';
 import {
   StyleSheet,
@@ -11,11 +11,15 @@ import {
   StatusBar,
   RefreshControl,
   Modal,
+  TextInput,
 } from 'react-native';
+import {SearchBar} from 'react-native-elements';
 var RNFS = require('react-native-fs');
 
 export default function Home({route, navigation}) {
   const {password} = route.params;
+
+  const [search, setSearch] = React.useState('');
 
   const [refreshing, setRefreshing] = React.useState(false);
   const [data, setData] = React.useState({});
@@ -24,8 +28,9 @@ export default function Home({route, navigation}) {
   // runs once for every focus
   useFocusEffect(
     React.useCallback(() => {
+      setSearch("");
       readFile();
-    }, [])
+    }, []),
   );
 
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -50,6 +55,28 @@ export default function Home({route, navigation}) {
     setD(d);
   }
 
+  async function searchBarFunc(text) {
+    if (text == "") {
+      readFile();
+      setSearch(text);
+      return;
+    }
+    setSearch(text);
+    text = text.toLowerCase()
+    var keyList = Object.keys(data);
+    var newKeyList = []
+    for (const item of keyList) {
+      if (item.toLowerCase().includes(text)) {
+        newKeyList.push(item)
+      }
+    }
+    var newData = {}
+    for (const item of newKeyList) {
+      newData[item] = data[item]
+    }
+    setData(newData)
+  }
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
@@ -72,7 +99,26 @@ export default function Home({route, navigation}) {
       </TouchableOpacity>
       <Text style={styles.h1}>Saved Credentials</Text>
       <Text style={styles.p}>Click an account to see details.</Text>
-      <ModalP modalVisible={modalVisible} setModalVisible={setModalVisible} data={data} d={d} navigation={navigation} password={password}/>
+      <View style={styles.searchBarS}>
+        <TextInput
+          style={styles.p}
+          placeholder="Search Here..."
+          placeholderTextColor="#f9f9f9ef" 
+          round
+          value={search}
+          onChangeText={text => searchBarFunc(text)}
+          autoCorrect={false}
+          autoCapitalize={'none'}
+        />
+      </View>
+      <ModalP
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        data={data}
+        d={d}
+        navigation={navigation}
+        password={password}
+      />
       <View style={styles.p}></View>
       <View style={styles.p}></View>
       <Entry data={data} modal={x => modal(x)} />
@@ -83,22 +129,31 @@ export default function Home({route, navigation}) {
 }
 
 export function Entry({data, modal}) {
-  const rv = Object.keys(data).sort().map(d => (
-    <TouchableOpacity key={d} style={styles.box} onPress={() => modal(d)}>
-      <Text style={styles.boxP1}>{data[d].name}</Text>
-      {/* 
+  const rv = Object.keys(data)
+    .sort()
+    .map(d => (
+      <TouchableOpacity key={d} style={styles.box} onPress={() => modal(d)}>
+        <Text style={styles.boxP1}>{data[d].name}</Text>
+        {/* 
       <Text style={styles.boxP2}>Username: {d.split('\n')[1]}</Text>
       <Text style={styles.boxP2}>Password: {d.split('\n')[2]}</Text>
       */}
-    </TouchableOpacity>
-  ));
+      </TouchableOpacity>
+    ));
   return rv;
 }
 
-export function ModalP({modalVisible, setModalVisible, data, d, navigation, password}) {
+export function ModalP({
+  modalVisible,
+  setModalVisible,
+  data,
+  d,
+  navigation,
+  password,
+}) {
   function edit() {
     setModalVisible(false);
-    navigation.navigate("Edit",  {password:password, data:data, d:d });
+    navigation.navigate('Edit', {password: password, data: data, d: d});
   }
 
   if (modalVisible) {
@@ -123,9 +178,7 @@ export function ModalP({modalVisible, setModalVisible, data, d, navigation, pass
           </View>
           <View style={styles.p}></View>
           <View style={styles.p}></View>
-          <TouchableOpacity
-            style={styles.close}
-            onPress={() => edit()}>
+          <TouchableOpacity style={styles.close} onPress={() => edit()}>
             <Text style={styles.mnav}>&#x270E; Edit</Text>
           </TouchableOpacity>
           <View style={styles.h1}></View>
@@ -182,13 +235,15 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.015,
     marginHorizontal: width * 0.05,
   },
-  buttonButton: {
-    marginVertical: height * 0.01,
-    borderWidth: 5,
+  searchBarS: {
+    marginVertical: height * 0.02,
+    marginHorizontal: width * 0.01,
+    paddingVertical: height * 0.006,
+    width: width * 0.8,
+    borderWidth: 4,
     borderStyle: 'solid',
-    borderRadius: 10,
+    borderRadius: 1000,
     borderColor: '#fff',
-    backgroundColor: '#4e4e56',
   },
   box: {
     marginVertical: height * 0.01,
