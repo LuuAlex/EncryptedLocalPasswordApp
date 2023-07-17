@@ -18,3 +18,6 @@ Important data for recovering saved passwords are stored in a folder called "Loc
 ## Future Updates:
 * Option to save password data in any folder of the user's choosing, including cloud storage drives like iCloud, OneDrive, and Google Drive
 * Support for Android Devices
+
+## Demo:
+https://github.com/LuuAlex/LocalPasswordStorage/assets/103136100/14162559-3b4b-4971-b9a9-71cb1e06ad29
