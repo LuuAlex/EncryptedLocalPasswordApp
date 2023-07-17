@@ -13,13 +13,13 @@ import {
   Modal,
   TextInput,
 } from 'react-native';
-import {SearchBar} from 'react-native-elements';
+// import {SearchBar} from 'react-native-elements';
 var RNFS = require('react-native-fs');
 
 export default function Home({route, navigation}) {
   const {password} = route.params;
 
-  const [search, setSearch] = React.useState('');
+  // const [search, setSearch] = React.useState('');
 
   const [refreshing, setRefreshing] = React.useState(false);
   const [data, setData] = React.useState({});
@@ -28,7 +28,7 @@ export default function Home({route, navigation}) {
   // runs once for every focus
   useFocusEffect(
     React.useCallback(() => {
-      setSearch("");
+      //setSearch('');
       readFile();
     }, []),
   );
@@ -55,6 +55,7 @@ export default function Home({route, navigation}) {
     setD(d);
   }
 
+  /*
   async function searchBarFunc(text) {
     if (text == "") {
       readFile();
@@ -76,6 +77,7 @@ export default function Home({route, navigation}) {
     }
     setData(newData)
   }
+  */
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -99,6 +101,7 @@ export default function Home({route, navigation}) {
       </TouchableOpacity>
       <Text style={styles.h1}>Saved Credentials</Text>
       <Text style={styles.p}>Click an account to see details.</Text>
+      {/* 
       <View style={styles.searchBarS}>
         <TextInput
           style={styles.p}
@@ -111,6 +114,7 @@ export default function Home({route, navigation}) {
           autoCapitalize={'none'}
         />
       </View>
+      */}
       <ModalP
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
