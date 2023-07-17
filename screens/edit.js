@@ -9,6 +9,7 @@ import {
   StatusBar,
   TextInput,
   ScrollView,
+  Alert,
 } from 'react-native';
 var RNFS = require('react-native-fs');
 
@@ -20,6 +21,23 @@ export default function Edit({route, navigation}) {
   const [value1, setText1] = React.useState(data[d].user);
   const [value2, setText2] = React.useState(data[d].pass);
 
+  async function confirmDelete() {
+    return Alert.alert(
+      'Confirm Delete Password',
+      'Are you sure you want to delete this credential? This action cannot be reversed.',
+      [
+        {
+          text: 'Delete',
+          onPress: () => {
+            deleteP();
+          },
+          style: 'destructive',
+        },
+        {text: 'No'},
+      ],
+    );
+  }
+
   async function submit() {
     try {
       const fileUri1 = `${dataLoc}/user.txt`;
@@ -28,14 +46,19 @@ export default function Edit({route, navigation}) {
       const salt = await RNFS.readFile(fileUri2);
       const hashInfo = Encryption.hash(password, salt);
 
-      data[d].name = name;
-      data[d].user = value1;
-      data[d].pass = value2;
+      var oldName = data[d].name.length
+      delete data[d];
+      const newID = `${name}${d.substr(oldName - d.length)}`
+
+      data[newID] = {name: "", user: "", pass: ""}
+      data[newID].name = name;
+      data[newID].user = value1;
+      data[newID].pass = value2;
 
       const newData = Encryption.encrypt(JSON.stringify(data), hashInfo);
       await RNFS.writeFile(fileUri1, newData);
     } catch {
-      console.log('error create new password');
+      console.log('error edit password');
     }
     navigation.navigate('Home', {password: password});
   }
@@ -68,7 +91,7 @@ export default function Edit({route, navigation}) {
         onPress={() => navigation.goBack('Home')}>
         <Text style={styles.nav}>&lt; Cancel</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.navButton2} onPress={() => deleteP()}>
+      <TouchableOpacity style={styles.navButton2} onPress={() => confirmDelete()}>
         <Text style={styles.nav}>&#x2715; DELETE</Text>
       </TouchableOpacity>
       <Text style={styles.h1}>Edit Credentials</Text>

@@ -83,7 +83,7 @@ export default function Home({route, navigation}) {
 }
 
 export function Entry({data, modal}) {
-  const rv = Object.keys(data).map(d => (
+  const rv = Object.keys(data).sort().map(d => (
     <TouchableOpacity key={d} style={styles.box} onPress={() => modal(d)}>
       <Text style={styles.boxP1}>{data[d].name}</Text>
       {/* 
