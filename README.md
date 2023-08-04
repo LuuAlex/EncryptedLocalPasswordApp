@@ -3,10 +3,10 @@ LocalPasswordStorage is a **React Native** app that allows users to store passwo
 
 
 ## How it Works:
-Important data for recovering saved passwords are stored in a folder called "LocalPasswordStorageDATA" in the app's sandboxed folder on the device. In this folder are three .txt files: hash, salt, and user.
-* **hash.txt**: Saves a **SHA3** hash of the password with salt appended to the front. The purpose is to check if the user-inputted password is correct.
+Important data for recovering saved passwords are stored in a folder called "LocalPasswordStorageDATA" in the app's sandboxed folder on the device. In this folder are three .txt files: hash, salt, and user. The master key is created using the master password and the randomized salt with the **PBKDF2** algorithm. In total, there are 3 unique **PBKDF2** keys generated from the master password and salt. Only one of the keys are stored locally on the device.
+* **hash.txt**: Saves a **PBKDF2** hash of the master key with salt appended. The purpose is to check if the user-inputted password is correct.
 * **salt.txt**: Saves the randomly created 64-character salt.
-* **user.txt**: Stores encrypted passwords. Encrypted using **AES**. The key used for encryption is created using the master password and the salt, using the **PBKDF2** algorithm. This key is not stored on the device.
+* **user.txt**: Stores encrypted passwords. Encrypted using **AES**. The key used for encryption is created using the master key and the salt, using the **PBKDF2** algorithm. This key is not stored on the device.
 
 # Features:
 * Each entry consists of an account name, username, and password
