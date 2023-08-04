@@ -14,7 +14,8 @@ export default class Encryption {
   }
 
   static passCheck(password, salt, hash) {
-    return CryptoJS.SHA3(`${salt}${password}`).toString(CryptoJS.enc.Base64) == hash;
+    var hashed = Encryption.hash(password, salt)
+    return hashed[2] == hash;
   }
 
   static hash(password, salt) {
@@ -24,9 +25,16 @@ export default class Encryption {
     var key = CryptoJS.PBKDF2(password, salt, {
       keySize: 512 / 32,
       iterations: 1394,
-    });
-    var hash = CryptoJS.SHA3(`${salt}${password}`).toString(CryptoJS.enc.Base64)
-    return [key.toString(CryptoJS.enc.Base64), salt, hash];
+    }).toString(CryptoJS.enc.Base64);
+    var key1 = CryptoJS.PBKDF2(key, salt, {
+      keySize: 256 / 32,
+      iterations: 179,
+    }).toString(CryptoJS.enc.Base64);
+    var key2 = CryptoJS.PBKDF2(key, salt+salt, {
+      keySize: 512 / 32,
+      iterations: 267,
+    }).toString(CryptoJS.enc.Base64);
+    return [key1, salt, key2];
   }
 
   static encrypt(message, hashed) {
